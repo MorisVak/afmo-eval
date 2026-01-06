@@ -1431,6 +1431,16 @@ def run_experiment_split(df: pd.DataFrame,
     with timed(f"{split_name}: fc"):
         fc = compute_fc_for_split(df_split, model_name, model_params, fc_horizon)
     with timed(f"{split_name}: fc_eval"):
+        ts_keys = sorted(df_split["ts_key"].unique())
+        fc_keys = sorted(fc.keys())
+
+        missing = sorted(set(ts_keys) - set(fc_keys))
+        extra   = sorted(set(fc_keys) - set(ts_keys))
+
+        print("missing in fc:", missing)
+        print("extra in fc:", extra)
+
+        assert not missing, f"Missing forecasts for: {missing}"
         fc_eval = evaluate_fc(df_split, fc, METRICS, fc_horizon)
     with timed(f"{split_name}: features"):
         X_raw, X_reduced, pca_pipe, X_train, meta = build_features_train(df_split, fc_horizon)
@@ -1665,11 +1675,27 @@ def run_experiment(df: pd.DataFrame,
         print(f"\n{'='*60}")
         print(f"[SPLIT {count_split+1}/3] Processing '{split_name}' split ({n_split_series} series)")
         print(f"{'='*60}")
-        
+
+        ts_keys = sorted(df_split["ts_key"].unique())
+
+
+        assert not missing, f"Missing forecasts for: {missing}"
+
+
         _notify(split_name.upper(), f"Computing forecasts ({n_split_series} series)", base_progress)
         with timed(f"{split_name}: fc"):
             fc = compute_fc_for_split(df_split, model_name, model_params, fc_horizon)
         with timed(f"{split_name}: fc_eval"):
+            ts_keys = sorted(df_split["ts_key"].unique())
+            fc_keys = sorted(fc.keys())
+
+            missing = sorted(set(ts_keys) - set(fc_keys))
+            extra   = sorted(set(fc_keys) - set(ts_keys))
+
+            print("missing in fc:", missing)
+            print("extra in fc:", extra)
+
+            assert not missing, f"Missing forecasts for: {missing}"
             fc_eval = evaluate_fc(df_split, fc, METRICS, fc_horizon)
         
         _notify(split_name.upper(), "Computing features", base_progress + 0.05)
