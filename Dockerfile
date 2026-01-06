@@ -4,7 +4,10 @@ WORKDIR /app
 COPY . /app
 
 # Install locked Linux deps to avoid ABI issues
-RUN pip install --no-cache-dir --upgrade pip setuptools wheel &&     pip install --no-cache-dir -r requirements-locked/linux-py311.txt &&     pip install --no-cache-dir -e .[ui]
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir -e .[ui]
+
 
 EXPOSE 8501
-CMD ["streamlit", "run", "app/AFMo.py", "--server.address=0.0.0.0"]
+CMD ["sh", "-c", "streamlit run app/AFMo.py --server.address=0.0.0.0 --server.port=${PORT:-10000} --server.headless=true"]
