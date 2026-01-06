@@ -12,6 +12,10 @@ from afmo.plots.registry import PlotKind
 from afmo.study import run_experiment, run_experiment_split
 from afmo.helpers import freq_to_periods_per_year
 
+import importlib.util
+spec = importlib.util.find_spec("lightgbm")
+st.write("lightgbm installed:", spec is not None)
+
 st.session_state["_active_page"] = "Study"
 # State
 #"study_plot_kinds_selected"   
