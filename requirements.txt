@@ -1,0 +1,15 @@
+streamlit
+pandas
+lightgbm
+numpy
+plotly
+statsmodels
+pmdarima
+python-dateutil
+pytest
+pytest-cov
+seaborn>=0.13.0
+scikit-learn
+tsfresh
+tslearn
+matplotlib>=3.7.0
