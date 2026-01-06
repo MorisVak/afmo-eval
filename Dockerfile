@@ -1,13 +1,13 @@
 FROM python:3.11-slim
 
+# Needed for LightGBM (OpenMP runtime)
+RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
-COPY . /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Install locked Linux deps to avoid ABI issues
-RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
-    pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir -e .[ui]
-
-
-EXPOSE 8501
-CMD ["sh", "-c", "streamlit run app/AFMo.py --server.address=0.0.0.0 --server.port=${PORT:-10000} --server.headless=true"]
+COPY . .
+EXPOSE 10000
+CMD ["streamlit", "run", "app/AFMO.py", "--server.port=10000", "--server.address=0.0.0.0"]

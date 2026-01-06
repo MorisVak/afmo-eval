@@ -1431,16 +1431,6 @@ def run_experiment_split(df: pd.DataFrame,
     with timed(f"{split_name}: fc"):
         fc = compute_fc_for_split(df_split, model_name, model_params, fc_horizon)
     with timed(f"{split_name}: fc_eval"):
-        ts_keys = [str(c) for c in df_split.columns]
-        fc_keys = [str(k) for k in fc.keys()]
-
-        missing = sorted(set(ts_keys) - set(fc_keys))
-        extra   = sorted(set(fc_keys) - set(ts_keys))
-
-        print("missing in fc:", missing)
-        print("extra in fc:", extra)
-
-        assert not missing, f"Missing forecasts for: {missing}"
         fc_eval = evaluate_fc(df_split, fc, METRICS, fc_horizon)
     with timed(f"{split_name}: features"):
         X_raw, X_reduced, pca_pipe, X_train, meta = build_features_train(df_split, fc_horizon)
@@ -1620,8 +1610,7 @@ def run_experiment(df: pd.DataFrame,
         Function called with (phase: str, message: str, progress: float) 
         where progress is 0.0 to 1.0. Used for UI updates.
     """
-    print("df columns sample:", list(df.columns)[:10])
-    print("has ts_key col?", "ts_key" in df.columns)
+    
     def _notify(phase: str, message: str, progress: float):
         """Helper to call progress callback if provided."""
         if progress_callback:
@@ -1676,24 +1665,11 @@ def run_experiment(df: pd.DataFrame,
         print(f"\n{'='*60}")
         print(f"[SPLIT {count_split+1}/3] Processing '{split_name}' split ({n_split_series} series)")
         print(f"{'='*60}")
-
-        ts_keys = [str(c) for c in df_split.columns]
-
-
+        
         _notify(split_name.upper(), f"Computing forecasts ({n_split_series} series)", base_progress)
         with timed(f"{split_name}: fc"):
             fc = compute_fc_for_split(df_split, model_name, model_params, fc_horizon)
         with timed(f"{split_name}: fc_eval"):
-            ts_keys = [str(c) for c in df_split.columns]
-            fc_keys = [str(k) for k in fc.keys()]
-
-            missing = sorted(set(ts_keys) - set(fc_keys))
-            extra   = sorted(set(fc_keys) - set(ts_keys))
-
-            print("missing in fc:", missing)
-            print("extra in fc:", extra)
-
-            assert not missing, f"Missing forecasts for: {missing}"
             fc_eval = evaluate_fc(df_split, fc, METRICS, fc_horizon)
         
         _notify(split_name.upper(), "Computing features", base_progress + 0.05)
