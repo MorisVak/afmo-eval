@@ -1431,8 +1431,8 @@ def run_experiment_split(df: pd.DataFrame,
     with timed(f"{split_name}: fc"):
         fc = compute_fc_for_split(df_split, model_name, model_params, fc_horizon)
     with timed(f"{split_name}: fc_eval"):
-        ts_keys = sorted(df_split["ts_key"].unique())
-        fc_keys = sorted(fc.keys())
+        ts_keys = [str(c) for c in df_split.columns]
+        fc_keys = [str(k) for k in fc.keys()]
 
         missing = sorted(set(ts_keys) - set(fc_keys))
         extra   = sorted(set(fc_keys) - set(ts_keys))
@@ -1684,8 +1684,8 @@ def run_experiment(df: pd.DataFrame,
         with timed(f"{split_name}: fc"):
             fc = compute_fc_for_split(df_split, model_name, model_params, fc_horizon)
         with timed(f"{split_name}: fc_eval"):
-            ts_keys = sorted(df_split["ts_key"].unique())
-            fc_keys = sorted(fc.keys())
+            ts_keys = [str(c) for c in df_split.columns]
+            fc_keys = [str(k) for k in fc.keys()]
 
             missing = sorted(set(ts_keys) - set(fc_keys))
             extra   = sorted(set(fc_keys) - set(ts_keys))
