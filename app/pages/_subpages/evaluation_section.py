@@ -43,6 +43,17 @@ def run_evaluation_section():
     line-height: 1.4;
     }
     .help-tooltip:hover .tooltip-text { visibility: visible; }
+                
+    /* Allow tooltips to escape table layout */
+    .eval-table-wrap { width: 100%; overflow: visible !important; }
+    .eval-table { border-collapse: collapse; width: 100%; table-layout: fixed; overflow: visible !important; }
+    .eval-th, .eval-td { padding: 6px 8px; overflow: visible !important; position: relative; }
+
+    /* Make sure tooltip sits on top of everything */
+    .help-tooltip { position: relative; display: inline-block; overflow: visible !important; }
+    .help-tooltip .tooltip-text {
+    z-index: 999999;
+    }
     </style>
     """, unsafe_allow_html=True)
     SCORE_TOOLTIPS = {
@@ -132,7 +143,18 @@ def run_evaluation_section():
         "Automatically selects the best-performing evaluation method based on cross-validated data."
     ),
 }
-     
+    def _format_percentages(x, decimals: int = 2) -> str:
+        """Format numeric values as percentages.
+        Assumes values are proportions in [0, 1] (common for these scores).
+        """
+        try:
+            v = float(x)
+        except Exception:
+            return "—"
+        if pd.isna(v):
+            return "—"
+        return f"{v * 100:.{decimals}f}%"
+
     
     def header_with_tooltip(title: str, tooltip_html: str):
         st.markdown(
@@ -194,7 +216,7 @@ def run_evaluation_section():
             c1, c2, c3 = st.columns(3)
             for col, key in zip((c1, c2, c3), ("mean", "lower", "upper")):
                 if key in row.index:
-                    col.metric(key, f"{float(row[key]):.4f}")
+                    col.metric(key, _format_percentages(row[key], decimals=2))
                 else:
                     col.metric(key, "—")
 
@@ -225,29 +247,29 @@ def run_evaluation_section():
                     metric_cell = f"<strong>{label}</strong>"
 
                 vals = "".join(
-                    f"<td style='padding:6px 8px;'>{float(view.loc[metric, c]):.4f}</td>"
+                    f"<td class='eval-td'>{_format_percentages(view.loc[metric, c], decimals=2)}</td>"
                     for c in view.columns
                 )
 
                 rows_html += f"""
                 <tr>
-                    <td style='padding:6px 8px;'>{metric_cell}</td>
-                    {vals}
+                <td class='eval-td'>{metric_cell}</td>
+                {vals}
                 </tr>
                 """
 
             header_cols = "".join(
-                f"<th style='text-align:left; padding:6px 8px;'>{html.escape(c)}</th>"
+                f"<th class='eval-th' style='text-align:left;'>{html.escape(c)}</th>"
                 for c in view.columns
             )
 
             st.markdown(
                 f"""
-                <div style="width:100%; overflow:hidden;">
-                <table style="border-collapse:collapse; width:100%; table-layout:fixed;">
+                <div class="eval-table-wrap">
+                <table class="eval-table">
                     <thead>
                     <tr>
-                        <th style="text-align:left; padding:6px 8px;">Metric</th>
+                        <th class="eval-th" style="text-align:left;">Metric</th>
                         {header_cols}
                     </tr>
                     </thead>
