@@ -72,16 +72,16 @@ def run_evaluation_section():
     METRIC_TOOLTIPS = {
         # Predictability metrics
         "rpa": (
-            "<strong>RPA – Residual Predictability Analysis</strong><br>"
-            "Quantifies the degree of predictability remaining in the residuals."
+            "<strong>RPA – Relative Percentage Accuracy</strong><br>"
+            "Measures how close predictions are to actual values in relative percentage terms."
         ),
         "rqa": (
-            "<strong>RQA – Recurrence Quantification Analysis</strong><br>"
-            "Measures recurring patterns and temporal structure in the residual series."
+            "<strong>RQA – Relative Quantity Accuracy</strong><br>"
+            "Evaluates prediction accuracy based on relative deviations in absolute quantities."
         ),
         "mia": (
-            "<strong>MIA – Mutual Information Analysis</strong><br>"
-            "Captures nonlinear dependencies in the residuals via information-theoretic measures."
+            "<strong>MIA – Mean Interval Accuracy</strong><br>"
+            "Assesses how accurately prediction intervals capture actual outcomes on average."
         ),
 
         # Effectiveness metrics
